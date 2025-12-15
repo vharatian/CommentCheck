@@ -1,0 +1,66 @@
+query PullRequestThreads(
+  $owner: String!,
+  $name: String!,
+  $afterPR: String,
+  $afterThread: String,
+  $afterComment: String
+) {
+  repository(owner: $owner, name: $name) {
+    pullRequests(
+      first: <PRS_PER_PAGE>,
+      after: $afterPR,
+      states: [MERGED],
+      orderBy: {field: UPDATED_AT, direction: DESC}
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        number
+        baseRefOid
+        headRefOid
+        title
+        body
+        createdAt
+        url
+        reviewThreads(first: <THREADS_PER_PAGE>, after: $afterThread) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            isResolved
+            path
+            line
+            originalLine
+            startLine
+            originalStartLine
+            comments(first: <COMMENTS_PER_THREAD_PAGE>, after: $afterComment) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              nodes {
+                id
+                body
+                createdAt
+                url
+                author {
+                  login
+                }
+                diffHunk
+                commit {
+                  oid
+                }
+                outdated
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
