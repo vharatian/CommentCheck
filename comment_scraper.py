@@ -23,7 +23,7 @@ OUTPUT_DIR = "/home/vahid/Desktop/CommentCheck/files/comments"
 
 # Maximum number of comments per repo to collect.
 # If set to None, script will collect all available comments.
-MAX_COMMENTS_PER_REPO: Optional[int] = 10
+MAX_COMMENTS_PER_REPO: Optional[int] = 1000
 
 # Only consider pull requests created on or before this ISO timestamp (UTC).
 # Example format: "2025-12-01T00:00:00Z"
@@ -331,6 +331,10 @@ def collect_repo_comments(session: requests.Session, owner: str, name: str) -> L
 
                     # diffHunk is already the specific hunk for this comment.
                     diff_hunk = first_comment.get("diffHunk")
+                    # If GitHub doesn't provide a diff hunk (or it's empty),
+                    # skip this comment – it doesn't have a concrete code context.
+                    if not diff_hunk or not str(diff_hunk).strip():
+                        continue
 
                     # Full diff for this specific file within the PR.
                     file_full_diff = file_diffs.get(path)

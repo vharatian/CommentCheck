@@ -1,0 +1,50 @@
+query SearchRepositories(
+  $query: String!,
+  $first: Int!,
+  $after: String
+) {
+  search(
+    query: $query,
+    type: REPOSITORY,
+    first: $first,
+    after: $after
+  ) {
+    repositoryCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      ... on Repository {
+        id
+        nameWithOwner
+        stargazerCount
+        languages(
+          first: 10,
+          orderBy: {field: SIZE, direction: DESC}
+        ) {
+          totalSize
+          edges {
+            size
+            node {
+              name
+            }
+          }
+        }
+        pullRequests(states: [OPEN, CLOSED, MERGED]) {
+          totalCount
+        }
+        issues(
+          first: 1,
+          orderBy: {field: UPDATED_AT, direction: DESC}
+        ) {
+          totalCount
+          nodes {
+            updatedAt
+            createdAt
+          }
+        }
+      }
+    }
+  }
+}
