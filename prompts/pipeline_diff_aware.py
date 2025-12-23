@@ -1,32 +1,29 @@
 import sys
 import os
-from dotenv import load_dotenv
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import dspy
 from scripts.load_examples_from_json import load_examples_from_json
 from validate_answers import normalize_bool
-from classifiers import DiffAwareClassifier
+from cot import DiffAwareActionabilityClassifier
 from sklearn.metrics import classification_report, confusion_matrix
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config 
 
 if __name__ == "__main__":
 
-    load_dotenv()
-
     lm = dspy.LM(
-        model=os.getenv("MODEL"),
-        api_base=os.getenv("API_BASE"),
-        # api_key=os.getenv("API_KEY"),
-        temperature=0.0,
-        max_tokens=120,
-        cache=True     
+        model=config.MODEL_NAME,
+        api_base=config.API_BASE,
+        api_key=config.API_KEY,
+        temperature=config.TEMPERATURE,
+        max_tokens=config.MAX_TOKENS,
+        cache=config.CACHE_ENABLED     
     )
     dspy.configure(lm=lm)
 
-    data_path = os.path.join(os.path.dirname(__file__), "../data/ground_truth.json")
-    dataset = load_examples_from_json(data_path)
-    testset = dataset[10:]
- 
-    program = DiffAwareClassifier()
+    testset = load_examples_from_json(config.EVALUATION_SET_PATH)
+    
+    program = DiffAwareActionabilityClassifier()
     compiled = program 
 
     predictions = []
@@ -44,6 +41,7 @@ if __name__ == "__main__":
         pred_labels.append(p_val)
 
         print(f"{i+1}  Real:{t_val}  Pred:{p_val}")
+        print(f"Reasoning: {prediction.reasoning}")
 
 
     print("\nClassification report:")
@@ -51,7 +49,3 @@ if __name__ == "__main__":
 
     print("\nConfusion Matrix:")
     print(confusion_matrix(true_labels, pred_labels))
-
-    print("\nDetailed Predictions:")
-    for prediction in predictions:
-        print(prediction)

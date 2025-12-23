@@ -1,6 +1,5 @@
-import sys, os
-from dotenv import load_dotenv
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import sys
+import os
 import dspy
 from dspy.teleprompt import KNNFewShot
 from sentence_transformers import SentenceTransformer
@@ -9,33 +8,30 @@ from validate_answers import normalize_bool
 from cot import DiffAwareActionabilityClassifier  
 from sklearn.metrics import classification_report, confusion_matrix
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import config  
 
 if __name__ == "__main__":
-    
-    load_dotenv()
 
     lm = dspy.LM(
-        model=os.getenv("MODEL"),
-        api_base=os.getenv("API_BASE"),
-        # api_key=os.getenv("API_KEY"),
-        temperature=0.0,
-        max_tokens=200,
-        cache=True
+        model=config.MODEL_NAME,
+        api_base=config.API_BASE,
+        api_key=config.API_KEY,
+        temperature=config.TEMPERATURE,
+        max_tokens=config.MAX_TOKENS,
+        cache=config.CACHE_ENABLED     
     )
     dspy.configure(lm=lm)
 
-    sentence_model = SentenceTransformer("all-MiniLM-L6-v2")
+    sentence_model = SentenceTransformer(config.EMBEDDING_MODEL)
 
-    data_path = os.path.join(os.path.dirname(__file__), "../data/ground_truth.json")
-    dataset = load_examples_from_json(data_path)
-
-    trainset = dataset[:10]
-    testset = dataset[10:20]
+    trainset = load_examples_from_json(config.EXAMPLES_SET_PATH)
+    testset = load_examples_from_json(config.EVALUATION_SET_PATH)
 
     program = DiffAwareActionabilityClassifier() 
 
     knn_optimizer = KNNFewShot(
-        k=4,  
+        k=config.KNN_K,  
         trainset=trainset,
         vectorizer=dspy.Embedder(sentence_model.encode)
     )
