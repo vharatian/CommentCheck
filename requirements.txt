@@ -4,3 +4,6 @@ dspy-ai
 sentence-transformers
 scikit-learn
 numpy
+tqdm
+pandas
+limits==3.10.0

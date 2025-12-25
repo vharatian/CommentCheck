@@ -18,7 +18,7 @@ GITHUB_API_URL = "https://api.github.com/graphql"
 SEARCH_QUERY_PATH = "/home/vahid/Desktop/CommentCheck/queries/query_search_repositories.graphql"
 
 # Output CSV file base path (timestamp will be added automatically)
-OUTPUT_CSV_BASE_PATH = "/home/vahid/Desktop/CommentCheck/files/repos"
+OUTPUT_CSV_BASE_PATH = "/home/vahid/Desktop/CommentCheck/files/repos/repos"
 
 # Search parameters
 PYTHON_PERCENTAGE_THRESHOLD = 95.0  # Minimum Python percentage (95%)
