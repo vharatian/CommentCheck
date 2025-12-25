@@ -78,7 +78,7 @@ Specifically, the following models are used:
 
 All models are accessed through a unified API interface and are interchangeable within the same experimental pipeline.
 
-## Language Model Configuration
+## Language Model Configuration
 
 ### Running Models Locally with Ollama
 
